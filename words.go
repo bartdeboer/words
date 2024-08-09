@@ -55,6 +55,15 @@ func ToSnakeCase(s string) string {
 	return strings.ToLower(strings.Join(words, "_"))
 }
 
+// ToConstantCase converts a given string to CONSTANT_CASE.
+// It splits words based on transitions between alphanumeric and non-alphanumeric characters,
+// as well as transitions between lowercase and uppercase characters.
+// Example: "ThisIsATest" -> "THIS_IS_A_TEST"
+func ToConstantCase(s string) string {
+	words := SplitWords(s)
+	return strings.ToUpper(strings.Join(words, "_"))
+}
+
 // ToKebabCase converts a given string to kebab-case.
 // It splits words based on transitions between alphanumeric and non-alphanumeric characters,
 // as well as transitions between lowercase and uppercase characters.

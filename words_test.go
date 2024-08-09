@@ -27,6 +27,24 @@ func TestToSnakeCase(t *testing.T) {
 	}
 }
 
+func TestToConstantCase(t *testing.T) {
+	tests := map[string]string{
+		"TestCase":          "TEST_CASE",
+		"AnotherExample123": "ANOTHER_EXAMPLE123",
+		"IOSystem":          "IO_SYSTEM",
+		"IOSystem-product":  "IO_SYSTEM_PRODUCT",
+		"A":                 "A",
+		"-":                 "",
+	}
+
+	for input, expected := range tests {
+		result := ToConstantCase(input)
+		if result != expected {
+			t.Errorf("ToSnakeCase(%s) = %s; want %s", input, result, expected)
+		}
+	}
+}
+
 func TestToKebabCase(t *testing.T) {
 	tests := map[string]string{
 		"TestCase":          "test-case",
