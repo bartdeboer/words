@@ -176,3 +176,76 @@ func BenchmarkSplitWords(b *testing.B) {
 		SplitWords(input)
 	}
 }
+
+func isNumeric(r byte) bool {
+	return (r >= '0' && r <= '9')
+}
+
+func isLower(r byte) bool {
+	return (r >= 'a' && r <= 'z')
+}
+
+func isUpper(r byte) bool {
+	return (r >= 'A' && r <= 'Z')
+}
+
+func isAlpha(r byte) bool {
+	return isUpper(r) || isLower(r)
+}
+
+func isAlphaNumeric(r byte) bool {
+	return isAlpha(r) || isNumeric(r)
+}
+
+const (
+	nonAlphaNumMask = 0 // 000
+	alphaNumMask    = 1 // 001
+	upperMask       = 2 // 010
+)
+
+func getMaskOriginal(r byte) int {
+	if isUpper(r) {
+		return alphaNumMask | upperMask
+	}
+	if isAlphaNumeric(r) {
+		return alphaNumMask
+	}
+	return nonAlphaNumMask
+}
+
+func BenchmarkGetMaskOriginal(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		getMaskOriginal('A')
+		getMaskOriginal('a')
+		getMaskOriginal('1')
+		getMaskOriginal('!')
+	}
+}
+
+// This function uses bitwise operations for efficiency, leveraging the ASCII
+// structure of characters:
+//
+// 1. 'A-Z' and 'a-z' differ only in bit 5, so `(r & 0xDF)` normalizes both to 'A-Z'.
+// 2. Digits ('0-9') are checked directly using range comparisons.
+// 3. The uppercase detection `(r & 0x20) == 0` identifies uppercase letters.
+func getMask(r byte) int {
+	// Check if the character is alphanumeric (letters or digits).
+	if (('A' <= (r & 0xDF)) && ((r & 0xDF) <= 'Z')) || ('0' <= r && r <= '9') {
+		// Check if the character is uppercase using bitwise operations.
+		if (r & 0x20) == 0 { // Uppercase letters have bit 5 cleared.
+			return alphaNumMask | upperMask
+		}
+		return alphaNumMask
+	}
+	// Non-alphanumeric characters.
+	return nonAlphaNumMask
+}
+
+func BenchmarkGetMask(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		getMask('A')
+		getMask('a')
+		getMask('1')
+		getMask('!')
+	}
+}
